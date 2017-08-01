@@ -27,6 +27,7 @@ public class SearchAdapter extends BaseAdapter implements Filterable {
     private Drawable suggestionIcon;
     private LayoutInflater inflater;
     private boolean ellipsize;
+    private boolean checkWholeString;
 
     public SearchAdapter(Context context, String[] suggestions) {
         inflater = LayoutInflater.from(context);
@@ -34,13 +35,16 @@ public class SearchAdapter extends BaseAdapter implements Filterable {
         this.suggestions = suggestions;
     }
 
-    public SearchAdapter(Context context, String[] suggestions, Drawable suggestionIcon, boolean ellipsize) {
+    public SearchAdapter(Context context, String[] suggestions, Drawable suggestionIcon, boolean ellipsize, boolean checkWholeString) {
         inflater = LayoutInflater.from(context);
         data = new ArrayList<>();
         this.suggestions = suggestions;
         this.suggestionIcon = suggestionIcon;
         this.ellipsize = ellipsize;
+        this.checkWholeString = checkWholeString;
     }
+
+
 
     @Override
     public Filter getFilter() {
@@ -54,8 +58,14 @@ public class SearchAdapter extends BaseAdapter implements Filterable {
                     List<String> searchData = new ArrayList<>();
 
                     for (String string : suggestions) {
-                        if (string.toLowerCase().startsWith(constraint.toString().toLowerCase())) {
-                            searchData.add(string);
+                        if(checkWholeString){
+                            if(string.toLowerCase().contains(constraint.toString().toLowerCase())){
+                                searchData.add(string);
+                            }
+                        } else {
+                            if (string.toLowerCase().startsWith(constraint.toString().toLowerCase())) {
+                                searchData.add(string);
+                            }
                         }
                     }
 

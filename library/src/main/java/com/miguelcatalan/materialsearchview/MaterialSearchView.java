@@ -415,7 +415,7 @@ public class MaterialSearchView extends FrameLayout implements Filter.FilterList
     public void setSuggestions(String[] suggestions) {
         if (suggestions != null && suggestions.length > 0) {
             mTintView.setVisibility(VISIBLE);
-            final SearchAdapter adapter = new SearchAdapter(mContext, suggestions, suggestionIcon, ellipsize);
+            final SearchAdapter adapter = new SearchAdapter(mContext, suggestions, suggestionIcon, ellipsize, false);
             setAdapter(adapter);
 
             setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -427,6 +427,25 @@ public class MaterialSearchView extends FrameLayout implements Filter.FilterList
         } else {
             mTintView.setVisibility(GONE);
         }
+    }
+
+    public void setSuggestions(String[] suggestions, boolean checkSuggestion) {
+
+        if (suggestions != null && suggestions.length > 0) {
+            mTintView.setVisibility(VISIBLE);
+            final SearchAdapter adapter = new SearchAdapter(mContext, suggestions, suggestionIcon, ellipsize, checkSuggestion);
+            setAdapter(adapter);
+
+            setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    setQuery((String) adapter.getItem(position), submit);
+                }
+            });
+        } else {
+            mTintView.setVisibility(GONE);
+        }
+
     }
 
     /**
@@ -668,70 +687,70 @@ public class MaterialSearchView extends FrameLayout implements Filter.FilterList
         super.onRestoreInstanceState(mSavedState.getSuperState());
     }
 
-    static class SavedState extends BaseSavedState {
-        String query;
-        boolean isSearchOpen;
+static class SavedState extends BaseSavedState {
+    String query;
+    boolean isSearchOpen;
 
-        SavedState(Parcelable superState) {
-            super(superState);
-        }
-
-        private SavedState(Parcel in) {
-            super(in);
-            this.query = in.readString();
-            this.isSearchOpen = in.readInt() == 1;
-        }
-
-        @Override
-        public void writeToParcel(Parcel out, int flags) {
-            super.writeToParcel(out, flags);
-            out.writeString(query);
-            out.writeInt(isSearchOpen ? 1 : 0);
-        }
-
-        //required field that makes Parcelables from a Parcel
-        public static final Creator<SavedState> CREATOR =
-                new Creator<SavedState>() {
-                    public SavedState createFromParcel(Parcel in) {
-                        return new SavedState(in);
-                    }
-
-                    public SavedState[] newArray(int size) {
-                        return new SavedState[size];
-                    }
-                };
+    SavedState(Parcelable superState) {
+        super(superState);
     }
 
-    public interface OnQueryTextListener {
-
-        /**
-         * Called when the user submits the query. This could be due to a key press on the
-         * keyboard or due to pressing a submit button.
-         * The listener can override the standard behavior by returning true
-         * to indicate that it has handled the submit request. Otherwise return false to
-         * let the SearchView handle the submission by launching any associated intent.
-         *
-         * @param query the query text that is to be submitted
-         * @return true if the query has been handled by the listener, false to let the
-         * SearchView perform the default action.
-         */
-        boolean onQueryTextSubmit(String query);
-
-        /**
-         * Called when the query text is changed by the user.
-         *
-         * @param newText the new content of the query text field.
-         * @return false if the SearchView should perform the default action of showing any
-         * suggestions if available, true if the action was handled by the listener.
-         */
-        boolean onQueryTextChange(String newText);
+    private SavedState(Parcel in) {
+        super(in);
+        this.query = in.readString();
+        this.isSearchOpen = in.readInt() == 1;
     }
 
-    public interface SearchViewListener {
-        void onSearchViewShown();
-
-        void onSearchViewClosed();
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        super.writeToParcel(out, flags);
+        out.writeString(query);
+        out.writeInt(isSearchOpen ? 1 : 0);
     }
+
+    //required field that makes Parcelables from a Parcel
+    public static final Creator<SavedState> CREATOR =
+            new Creator<SavedState>() {
+                public SavedState createFromParcel(Parcel in) {
+                    return new SavedState(in);
+                }
+
+                public SavedState[] newArray(int size) {
+                    return new SavedState[size];
+                }
+            };
+}
+
+public interface OnQueryTextListener {
+
+    /**
+     * Called when the user submits the query. This could be due to a key press on the
+     * keyboard or due to pressing a submit button.
+     * The listener can override the standard behavior by returning true
+     * to indicate that it has handled the submit request. Otherwise return false to
+     * let the SearchView handle the submission by launching any associated intent.
+     *
+     * @param query the query text that is to be submitted
+     * @return true if the query has been handled by the listener, false to let the
+     * SearchView perform the default action.
+     */
+    boolean onQueryTextSubmit(String query);
+
+    /**
+     * Called when the query text is changed by the user.
+     *
+     * @param newText the new content of the query text field.
+     * @return false if the SearchView should perform the default action of showing any
+     * suggestions if available, true if the action was handled by the listener.
+     */
+    boolean onQueryTextChange(String newText);
+}
+
+public interface SearchViewListener {
+    void onSearchViewShown();
+
+    void onSearchViewClosed();
+}
 
 
 }
